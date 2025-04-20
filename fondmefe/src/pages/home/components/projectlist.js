@@ -5,7 +5,7 @@ function PopularProjects(props){
     useEffect(() => {
         const type = props.title.toLowerCase();
     
-        fetch(`http://localhost:8080/projects?type=${type}`)
+        fetch(`http://localhost:8080/api/projects?type=${type}`)
           .then((res) => {
             if (res.ok) return res.json();
             throw new Error("Failed to fetch");
