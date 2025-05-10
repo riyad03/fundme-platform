@@ -21,11 +21,17 @@ public class GatewayController {
         this.restTemplate=restTemplate;
     }
 
+    @GetMapping("/projects")
+    public ResponseEntity<?> routeToProjectService(@RequestParam Map<String,String> params){
+        String url=paths[0]+"/projects?"+getQueryString(params);
+        return restTemplate.getForEntity(url, Object.class);
+    }
+    /*
     @GetMapping("/projects/batch")
     public ResponseEntity<?> routeToProjectService(@RequestParam Map<String,String> params){
         String url=paths[0]+"/projects/batch?"+getQueryString(params);
         return restTemplate.getForEntity(url, Object.class);
-    }
+    }*/
     /*@PostMapping("/analyze")
     public ResponseEntity<?> routeToKeywordService(@RequestBody Map<String,Object> body){
         /*String url=paths[1]+"/analyze";
@@ -37,13 +43,14 @@ public class GatewayController {
         String url=paths[1]+"/analyze";
         return restTemplate.postForEntity(url,body,Object.class);
     }
-    @GetMapping("/donations")
+    /*@GetMapping("/donations")
     public ResponseEntity<?> routeToDataHub(){
         String test="this a test to datahub";
         String url=paths[2]+"/donations/test";
         return restTemplate.getForEntity(url, Object.class);
-    }
-    
+    }*/
+
+    /**for testing**/
     @GetMapping("/test")
     public String test1(){
         return "Get test success";

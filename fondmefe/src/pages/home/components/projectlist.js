@@ -1,6 +1,6 @@
 import React, { useEffect,useState } from "react";
 import { Link } from "react-router-dom";
-
+import {calculateDateDifference} from "../../../components/calc";
 
 
 function PopularProjects(props){
@@ -8,7 +8,7 @@ function PopularProjects(props){
     useEffect(() => {
         const type = (props.status).toLowerCase();
     
-        fetch(`http://localhost:8080/api/projects/batch?type=${type}`)
+        fetch(`http://localhost:8080/api/projects?status=${type}`)
           .then((res) => {
             if (res.ok) return res.json();
             throw new Error("Failed to fetch");
@@ -21,6 +21,7 @@ function PopularProjects(props){
       }, [props.tag]);
 
     const proj=ProjectData || [{id:0, title:'test'},{id:1, title:'test1'}];
+   
     //const proj=[{id:0, title:'test'}];
     return(
         <section className="ProjectList">
@@ -33,13 +34,14 @@ function PopularProjects(props){
                     {proj.map(key=> (
                         <Link key={key.id} to={`/projects/${key.id}`}>
                             <div className="Project" class="w-[300px] h-[330px] border border-[#222222] rounded-[20px] overflow-hidden bg-[#191919cc]">
-                                <div class="h-[180px] bg-white"><img></img></div>
+                                <div class="overflow-hidden h-[180px] bg-white"><img src={`https://storage.cloud.google.com/fundme-asset/${key.name+key.imageId}.png`}></img></div>
                                 <div className="Description" class="h-[120px] p-[20px] pt-[10px]">
-                                    <h1 class="text-white text-[22px] font-normal">Project Title</h1>
+                                    <h1 class="text-white text-[22px] font-normal">{key.name}</h1>
                                     <p class="text-[#6e6e6e] mb-[10px]">Jebrane_7mar</p>
                                     <div className="details" class=" flex justify-between text-[#6e6e6e]">
-                                        <p>1200 contributions</p>
-                                        <p>13 years ago</p>
+                                        <p>{key.id} views</p>
+                                        <p>{calculateDateDifference(key.dateStarted)}
+                                        </p>
                                     </div>
                                 
                                     <div className="CallAction" class="flex justify-start">
