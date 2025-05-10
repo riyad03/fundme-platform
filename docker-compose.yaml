@@ -1,0 +1,76 @@
+version: '3'
+
+services:
+  fondmefe:
+    build: 
+      context: ./fondmefe
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - manual-api-gateway-service
+    networks:
+      - project_app-network
+    environment:
+      - ENV_VAR=value
+  
+  keyword-project-service:
+    build: 
+      context: ./keyword-project-service
+      dockerfile: Dockerfile
+    ports:
+      - "8085:5000"
+    depends_on:
+      - manual-api-gateway-service
+    networks:
+      # - project_app-network
+      - keyword_gateway
+    environment:
+      - ENV_VAR=value
+    
+  manual-api-gateway-service:
+    build:
+      context: ./manual-api-gateway-service
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    # depends_on:
+    #   - keyword-project-service
+    networks:
+      - project_app-network
+      - keyword_gateway
+    environment:
+      - ENV_VAR=value
+
+  datahub-service:
+    build:
+      context: ./datahub
+      dockerfile: Dockerfile
+    ports:
+      - "8086:7000"
+    depends_on:
+      - project-discovery-service
+    networks:
+      - project_app-network
+    environment:
+      - ENV_VAR=value
+    
+  project-discovery-service:
+    build:
+      context: ./project-discovery-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:6000"
+    depends_on:
+      - manual-api-gateway-service
+    networks:
+      - project_app-network
+    environment:
+      - ENV_VAR=value
+
+networks:
+  project_app-network:
+    driver: bridge
+  keyword_gateway:
+    driver: bridge
+    

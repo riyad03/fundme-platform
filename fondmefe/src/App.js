@@ -7,6 +7,7 @@ import Contact from './pages/contactus/contact';
 import Nav from './components/nav';
 import Footer from './components/footer';
 import {BrowserRouter  as Router, Routes, Route} from 'react-router-dom';
+import ProjectDetails from './pages/project/projectDetails';
 function App() {
   return (
     <Router>
@@ -20,7 +21,7 @@ function App() {
           <Route path='/about' element={<About />}/>
           <Route path='/launch' element={<Launch />}/>
           <Route path='/contactus' element={<Contact />}/>
-          
+          <Route path='/projects/:projectid' element={<ProjectDetails/>}/>
         </Routes>
         </main>
         <footer>

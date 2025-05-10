@@ -18,7 +18,7 @@ function SearchBar() {
       })
       .catch((err) => console.error('Error', err));
   };
-
+  
   const handleSuggestionClick = (suggestion) => {
     setQuery(suggestion);
     setSuggestions([]);
@@ -60,7 +60,7 @@ function SearchBar() {
 
           {suggestions.length > 0 && (
             <ul className="absolute top-[60px] bg-white text-black border border-gray-300 w-full rounded shadow z-10">
-              {suggestions.map((key,item) => (
+              {suggestions.map((item,key) => (
                 <li
                   key={key}
                   onClick={() => handleSuggestionClick(item)}

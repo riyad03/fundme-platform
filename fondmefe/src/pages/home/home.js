@@ -10,9 +10,9 @@ const Home = () => {
       <Header />
       <Performance />
       <SearchBar />
-      <PopularProjects title="Popular" />
-      <PopularProjects title="Recommended" />
-      <PopularProjects title="Interviews" />
+      <PopularProjects status="Popular" />
+      <PopularProjects status="Recommended" />
+      <PopularProjects status="Interviews" />
     </section>
   );
 };
