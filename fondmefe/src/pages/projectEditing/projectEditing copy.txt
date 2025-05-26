@@ -1,0 +1,480 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Textarea } from "@/components/ui/textarea"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { CalendarDays, Edit, ExternalLink, MoreHorizontal, Moon, Plus, Sun, Trash2 } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ThemeProvider } from "@/components/theme-provider"
+import { useTheme } from "next-themes"
+
+// Sample data - replace with your actual data source
+const initialProjects = [
+  {
+    id: "1",
+    title: "E-commerce Website",
+    description: "A fully functional online store with product listings, cart, and checkout.",
+    status: "In Progress",
+    dueDate: "2023-12-15",
+    thumbnail: "/placeholder.svg?height=100&width=200",
+  },
+  {
+    id: "2",
+    title: "Mobile App Redesign",
+    description: "Redesigning the UI/UX for our flagship mobile application.",
+    status: "Completed",
+    dueDate: "2023-10-30",
+    thumbnail: "/placeholder.svg?height=100&width=200",
+  },
+  {
+    id: "3",
+    title: "Marketing Campaign",
+    description: "Q4 digital marketing campaign across social media platforms.",
+    status: "Planning",
+    dueDate: "2023-11-01",
+    thumbnail: "/placeholder.svg?height=100&width=200",
+  },
+]
+
+// User data - replace with actual user data
+const userData = {
+  name: "Sarah Johnson",
+  email: "sarah.johnson@example.com",
+  role: "Project Manager",
+  avatar: "/placeholder.svg?height=40&width=40",
+}
+
+// Theme toggle component
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
+
+  return (
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      aria-label="Toggle theme"
+    >
+      {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+    </Button>
+  )
+}
+
+export default function UserProjectManagement({
+  initialUserData = userData,
+  initialProjectsData = initialProjects,
+  onProjectUpdate = (project) => console.log("Project updated:", project),
+  onProjectDelete = (projectId) => console.log("Project deleted:", projectId),
+  onProjectCreate = (project) => console.log("Project created:", project),
+}) {
+  const [user] = useState(initialUserData)
+  const [projects, setProjects] = useState(initialProjectsData)
+  const [editingProject, setEditingProject] = useState(null)
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+
+  // Form state for creating/editing projects
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    status: "Planning",
+    dueDate: "",
+    thumbnail: "",
+  })
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleEditProject = (project) => {
+    setEditingProject(project)
+    setFormData({
+      title: project.title,
+      description: project.description,
+      status: project.status,
+      dueDate: project.dueDate,
+      thumbnail: project.thumbnail,
+    })
+    setIsEditDialogOpen(true)
+  }
+
+  const handleUpdateProject = () => {
+    const updatedProject = { ...editingProject, ...formData }
+    const updatedProjects = projects.map((p) => (p.id === updatedProject.id ? updatedProject : p))
+
+    setProjects(updatedProjects)
+    onProjectUpdate(updatedProject)
+    setIsEditDialogOpen(false)
+  }
+
+  const handleCreateProject = () => {
+    const newProject = {
+      id: Date.now().toString(),
+      ...formData,
+    }
+
+    setProjects([...projects, newProject])
+    onProjectCreate(newProject)
+    setFormData({
+      title: "",
+      description: "",
+      status: "Planning",
+      dueDate: "",
+      thumbnail: "",
+    })
+    setIsCreateDialogOpen(false)
+  }
+
+  const handleDeleteProject = (projectId) => {
+    setProjects(projects.filter((p) => p.id !== projectId))
+    onProjectDelete(projectId)
+  }
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Completed":
+        return "bg-green-500"
+      case "In Progress":
+        return "bg-blue-500"
+      case "Planning":
+        return "bg-amber-500"
+      default:
+        return "bg-gray-500"
+    }
+  }
+
+  return (
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+      <div className="w-full max-w-6xl mx-auto p-4">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Project Dashboard</h1>
+          <ThemeToggle />
+        </div>
+
+        <Tabs defaultValue="projects" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="projects" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Your Projects</h2>
+              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    New Project
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New Project</DialogTitle>
+                    <DialogDescription>Add the details for your new project.</DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="title">Project Title</Label>
+                      <Input
+                        id="title"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleInputChange}
+                        placeholder="Enter project title"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="description">Description</Label>
+                      <Textarea
+                        id="description"
+                        name="description"
+                        value={formData.description}
+                        onChange={handleInputChange}
+                        placeholder="Describe your project"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="status">Status</Label>
+                        <select
+                          id="status"
+                          name="status"
+                          value={formData.status}
+                          onChange={handleInputChange}
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <option value="Planning">Planning</option>
+                          <option value="In Progress">In Progress</option>
+                          <option value="Completed">Completed</option>
+                        </select>
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="dueDate">Due Date</Label>
+                        <Input
+                          id="dueDate"
+                          name="dueDate"
+                          type="date"
+                          value={formData.dueDate}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="thumbnail">Thumbnail URL</Label>
+                      <Input
+                        id="thumbnail"
+                        name="thumbnail"
+                        value={formData.thumbnail}
+                        onChange={handleInputChange}
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleCreateProject}>Create Project</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {projects.map((project) => (
+                <Card key={project.id} className="overflow-hidden">
+                  <div className="relative h-40 bg-muted">
+                    <img
+                      src={project.thumbnail || "/placeholder.svg"}
+                      alt={project.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-2 right-2">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 bg-background/80 rounded-full">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleEditProject(project)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDeleteProject(project.id)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                            View Details
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-start">
+                      <CardTitle className="text-lg">{project.title}</CardTitle>
+                      <Badge className={`${getStatusColor(project.status)} text-white`}>{project.status}</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pb-2">
+                    <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
+                  </CardContent>
+                  <CardFooter className="flex justify-between pt-0">
+                    <div className="flex items-center text-xs text-muted-foreground">
+                      <CalendarDays className="mr-1 h-3 w-3" />
+                      Due: {new Date(project.dueDate).toLocaleDateString()}
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => handleEditProject(project)}>
+                      <Edit className="mr-2 h-3 w-3" />
+                      Edit
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="profile">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
+                    <AvatarFallback>
+                      {user.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <CardTitle>{user.name}</CardTitle>
+                    <CardDescription>{user.role}</CardDescription>
+                    <p className="text-sm text-muted-foreground mt-1">{user.email}</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-medium">Account Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                      <div>
+                        <Label htmlFor="display-name">Display Name</Label>
+                        <Input id="display-name" value={user.name} readOnly />
+                      </div>
+                      <div>
+                        <Label htmlFor="email">Email</Label>
+                        <Input id="email" value={user.email} readOnly />
+                      </div>
+                      <div>
+                        <Label htmlFor="role">Role</Label>
+                        <Input id="role" value={user.role} readOnly />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-medium">Project Statistics</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2">
+                      <Card>
+                        <CardContent className="pt-6">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold">{projects.length}</div>
+                            <p className="text-xs text-muted-foreground">Total Projects</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardContent className="pt-6">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold">
+                              {projects.filter((p) => p.status === "In Progress").length}
+                            </div>
+                            <p className="text-xs text-muted-foreground">In Progress</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardContent className="pt-6">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold">
+                              {projects.filter((p) => p.status === "Completed").length}
+                            </div>
+                            <p className="text-xs text-muted-foreground">Completed</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button variant="outline" className="w-full">
+                  Edit Profile
+                </Button>
+              </CardFooter>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* Edit Project Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Project</DialogTitle>
+              <DialogDescription>Make changes to your project.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-title">Project Title</Label>
+                <Input id="edit-title" name="title" value={formData.title} onChange={handleInputChange} />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-description">Description</Label>
+                <Textarea
+                  id="edit-description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-status">Status</Label>
+                  <select
+                    id="edit-status"
+                    name="status"
+                    value={formData.status}
+                    onChange={handleInputChange}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="Planning">Planning</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-dueDate">Due Date</Label>
+                  <Input
+                    id="edit-dueDate"
+                    name="dueDate"
+                    type="date"
+                    value={formData.dueDate}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-thumbnail">Thumbnail URL</Label>
+                <Input id="edit-thumbnail" name="thumbnail" value={formData.thumbnail} onChange={handleInputChange} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleUpdateProject}>Save Changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </ThemeProvider>
+  )
+}

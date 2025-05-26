@@ -6,8 +6,11 @@ import Launch from './pages/launch/launch';
 import Contact from './pages/contactus/contact';
 import Nav from './components/nav';
 import Footer from './components/footer';
-import {BrowserRouter  as Router, Routes, Route} from 'react-router-dom';
+import AuthPage from './pages/signin/page'
+import CreateProject from './pages/projectCreation/projectCreation';
+import {HashRouter   as Router, Routes, Route} from 'react-router-dom';
 import ProjectDetails from './pages/project/projectDetails';
+import ProjectManagementTabs from './pages/projectEditing/ProjectManagementTabs';
 function App() {
   return (
     <Router>
@@ -22,6 +25,9 @@ function App() {
           <Route path='/launch' element={<Launch />}/>
           <Route path='/contactus' element={<Contact />}/>
           <Route path='/projects/:projectid' element={<ProjectDetails/>}/>
+          <Route path='/signup' element={<AuthPage/>}/>
+          <Route path='/projectcreation' element={<CreateProject/>}/>
+          <Route path='/projectediting' element={<ProjectManagementTabs/>}/>
         </Routes>
         </main>
         <footer>

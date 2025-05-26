@@ -89,3 +89,8 @@ target/
 # Python-related
 __pycache__/
 *.pyc
+
+project-discovery-service/src/main/resources/project_discovery_service.json
+
+
+

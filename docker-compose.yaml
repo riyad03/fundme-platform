@@ -11,6 +11,9 @@ services:
       - manual-api-gateway-service
     networks:
       - project_app-network
+    volumes:
+      - "D:/aliro/CrowdFunding project/Project/fondmefe/public/fileStorage/projectData:/app/public/fileStorage/projectData"
+      
     environment:
       - ENV_VAR=value
   
@@ -42,18 +45,31 @@ services:
     environment:
       - ENV_VAR=value
 
-  datahub-service:
+  user-service:
     build:
-      context: ./datahub
+      context: ./user-project-service
       dockerfile: Dockerfile
     ports:
-      - "8086:7000"
+      - "8087:6100"
     depends_on:
-      - project-discovery-service
+      - manual-api-gateway-service
     networks:
       - project_app-network
     environment:
       - ENV_VAR=value
+
+  # datahub-service:
+  #   build:
+  #     context: ./datahub
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8086:7000"
+  #   depends_on:
+  #     - project-discovery-service
+  #   networks:
+  #     - project_app-network
+  #   environment:
+  #     - ENV_VAR=value
     
   project-discovery-service:
     build:
@@ -65,6 +81,8 @@ services:
       - manual-api-gateway-service
     networks:
       - project_app-network
+    volumes:
+      - "D:/aliro/CrowdFunding project/Project/fondmefe/public/fileStorage/projectData:/app/uploads"
     environment:
       - ENV_VAR=value
 

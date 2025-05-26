@@ -11,8 +11,9 @@ const Home = () => {
       <Performance />
       <SearchBar />
       <PopularProjects status="Popular" />
+      {/*
       <PopularProjects status="Recommended" />
-      <PopularProjects status="Interviews" />
+      <PopularProjects status="Interviews" /> */}
     </section>
   );
 };

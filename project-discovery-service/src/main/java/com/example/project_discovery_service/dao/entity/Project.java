@@ -27,6 +27,15 @@ public class Project {
     @Column(name = "video_id")
     private Long videoId;
 
+    @Column(name = "video_url")
+    private String videoUrl;
+
+    @Column(name = "live_url")
+    private String liveUrl;   // URL of the uploaded live file
+
+    @Column(name = "image_url")
+    private String imageUrl;  // URL of the uploaded image file
+
     @Column(name = "live_id")
     private Long liveId;
 

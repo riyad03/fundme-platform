@@ -5,6 +5,8 @@ import {Link} from 'react-router-dom';
 
 function SuggestionsComp(props){
     const [ProjectsData,SetProjects]=useState(null);
+    
+
     useEffect(()=>{
         
         const type=(props.SimilarTag || 'default').toLowerCase();
@@ -16,9 +18,15 @@ function SuggestionsComp(props){
             SetProjects(data);
             
         }).catch((err) => console.error("❌ Fetch error:", err));
-    },props.tag)
+    },props.tag);
+
+    
+
+   
+
     
     const Relatedprojects=[{id:0,title:"test"},{id:1,title:"test"},{id:2,title:"test"}]||ProjectsData;
+    
     return(
         <div class="p-[30px] pl-[80px]">
             <h1 class="text-[30px] font-semibold">More related to {props.SimilarTag}</h1>
@@ -31,8 +39,8 @@ function SuggestionsComp(props){
                              <div className="Project" class="w-[300px] h-[330px] border border-[#222222] rounded-[20px] overflow-hidden bg-[#191919cc]">
                                 <div class="h-[180px] bg-white"><img></img></div>
                                 <div className="Description" class="h-[120px] p-[20px] pt-[10px]">
-                                    <h1 class="text-white text-[22px] font-normal">Project Title</h1>
-                                    <p class="text-[#6e6e6e] mb-[10px]">Jebrane_7mar</p>
+                                    <h1 class="text-white text-[22px] font-normal">{Relatedprojects.name}</h1>
+                                    <p class="text-[#6e6e6e] mb-[10px]">Riyad Rachidi</p>
                                     <div className="details" class=" flex justify-between text-[#6e6e6e]">
                                         <p>1200 contributions</p>
                                         <p>13 years ago</p>
